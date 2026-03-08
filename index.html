@@ -526,7 +526,7 @@ nav{padding:0 14px;}
   ████    
  ████     
 ████      
-███       </pre><span class="version-badge">v2.4.4</span></div>
+███       </pre><span class="version-badge">v2.4.5</span></div>
   <div class="nav-links">
     <button class="nav-btn active" onclick="showPage('home')">Accueil</button>
     <button class="nav-btn" onclick="showPage('create')">Créer</button>
@@ -1412,9 +1412,7 @@ document.addEventListener('keydown',function(e){
     if(e.key==='Enter'&&!e.shiftKey&&wAnswered){
       // Only advance if "Suivant" is visible AND "J'avais raison" is hidden
       var nextBtn=document.getElementById('write-next-btn');
-      var overrideBtn=document.getElementById('write-override-btn');
-      var overrideVisible=overrideBtn&&overrideBtn.classList.contains('show');
-      if(nextBtn&&nextBtn.style.display!=='none'&&!overrideVisible){
+      if(nextBtn&&nextBtn.style.display!=='none'){
         e.preventDefault();
         nextWrite();
       }
