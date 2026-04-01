@@ -3,7 +3,29 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<script>
+// ── Redirection automatique selon l'appareil ──
+(function() {
+  var ua = navigator.userAgent;
+  var isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  var currentFile = window.location.pathname.split('/').pop();
+  var isDesktopFile = currentFile === 'flashcard-app.html' || currentFile === '';
+  var isMobileFile  = currentFile === 'flashlearn-mobile.html';
+
+// Si on est sur la version desktop mais sur mobile → redirige vers mobile
+if (isMobile && isDesktopFile) {
+window.location.replace(‘flashlearn-mobile.html’);
+return;
+}
+// Si on est sur la version mobile mais sur desktop → redirige vers desktop
+if (!isMobile && isMobileFile) {
+window.location.replace(‘flashcard-app.html’);
+return;
+}
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>FlashLearn</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
@@ -166,6 +188,31 @@ text-align:center; cursor:pointer; transition:all .2s; margin-bottom:30px; color
 }
 .import-zone:hover,.import-zone.drag-over { border-color:var(–accent); color:var(–accent); background:rgba(108,99,255,.05); }
 .import-zone strong { display:block; font-size:.97rem; margin-bottom:4px; color:var(–text); }
+
+/* Home continue banner */
+.home-continue-banner {
+background:linear-gradient(135deg,#1a1830,#131f15);
+border:1.5px solid rgba(108,99,255,.3); border-radius:var(–radius);
+padding:20px 22px; margin-bottom:24px; cursor:pointer; transition:all .22s;
+display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;
+box-shadow:0 4px 24px rgba(108,99,255,.12);
+}
+.home-continue-banner:hover { border-color:rgba(108,99,255,.6); transform:translateY(-2px); box-shadow:0 8px 32px rgba(108,99,255,.2); }
+.hcb-label { font-size:.72rem; font-weight:700; color:#a5a1ff; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.hcb-title { font-family:‘Syne’,sans-serif; font-size:1.15rem; font-weight:800; margin-bottom:4px; }
+.hcb-meta  { font-size:.78rem; color:var(–muted); }
+.hcb-modes { display:flex; gap:8px; align-items:flex-start; flex-shrink:0; flex-wrap:wrap; margin-top:4px; }
+.hcb-btn { font-size:.75rem; font-weight:700; padding:6px 12px; border-radius:8px; cursor:pointer; transition:all .18s; }
+.hcb-btn:hover { transform:translateY(-1px); }
+.hcb-flash { background:rgba(108,99,255,.18); color:#a5a1ff !important; -webkit-text-fill-color:#a5a1ff !important; }
+.hcb-write { background:rgba(251,191,36,.14); color:#fcd34d !important; -webkit-text-fill-color:#fcd34d !important; }
+.hcb-test  { background:rgba(255,101,132,.14); color:#ffb3c1 !important; -webkit-text-fill-color:#ffb3c1 !important; }
+
+/* Stats rapides accueil */
+.home-stats-row { display:flex; gap:10px; margin-bottom:24px; }
+.home-stat { flex:1; background:var(–surface); border:1.5px solid var(–border); border-radius:14px; padding:13px 10px; text-align:center; }
+.home-stat-num { font-family:‘Syne’,sans-serif; font-size:1.4rem; font-weight:800; color:#a5a1ff; }
+.home-stat-lbl { font-size:.72rem; color:var(–muted); margin-top:3px; }
 
 .section-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
 .section-title { font-family:‘Syne’,sans-serif; font-size:.95rem; font-weight:700; color:var(–muted); text-transform:uppercase; letter-spacing:1px; }
@@ -479,6 +526,60 @@ box-shadow:0 8px 28px rgba(0,0,0,.4); z-index:9999; opacity:0; transition:opacit
 }
 #toast.show { opacity:1; }
 
+/* ── Drag overlay global ── */
+.drag-overlay {
+position:fixed; inset:0; z-index:400;
+background:rgba(108,99,255,.13);
+border:3px dashed var(–accent);
+display:flex; align-items:center; justify-content:center;
+pointer-events:none; opacity:0; transition:opacity .2s;
+}
+.drag-overlay.show { opacity:1; }
+.drag-overlay-label {
+font-family:‘Syne’,sans-serif; font-size:1.6rem; font-weight:800;
+color:var(–accent); text-align:center;
+}
+
+/* ── Modal de partage ── */
+.share-modal-overlay {
+position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(6px);
+z-index:300; display:flex; align-items:center; justify-content:center;
+opacity:0; pointer-events:none; transition:opacity .2s;
+}
+.share-modal-overlay.open { opacity:1; pointer-events:all; }
+.share-modal {
+background:var(–surface); border:1.5px solid var(–border); border-radius:20px;
+padding:28px; max-width:480px; width:90%; box-shadow:0 24px 60px rgba(0,0,0,.5);
+transform:translateY(14px) scale(.97); transition:transform .22s;
+color:var(–text); -webkit-text-fill-color:var(–text);
+}
+.share-modal-overlay.open .share-modal { transform:translateY(0) scale(1); }
+.share-modal h3 { font-family:‘Syne’,sans-serif; font-size:1.15rem; font-weight:700; margin-bottom:6px; }
+.share-modal p  { color:var(–muted); font-size:.88rem; margin-bottom:16px; line-height:1.5; }
+.share-url-box {
+display:flex; gap:8px; align-items:center;
+background:var(–surface2); border:1.5px solid var(–border);
+border-radius:12px; padding:10px 14px; margin-bottom:14px;
+}
+.share-url-text {
+flex:1; font-size:.78rem; color:var(–muted); overflow:hidden;
+text-overflow:ellipsis; white-space:nowrap; font-family:monospace;
+-webkit-text-fill-color:var(–muted);
+}
+.share-copy-btn {
+background:var(–accent); color:#fff !important; -webkit-text-fill-color:#fff !important;
+border:none; border-radius:8px; padding:6px 14px; font-family:‘DM Sans’,sans-serif;
+font-size:.82rem; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0;
+transition:background .18s;
+}
+.share-copy-btn:hover { background:#5a52e0; }
+.share-qr {
+text-align:center; padding:10px 0 4px;
+font-size:.78rem; color:var(–muted);
+}
+.tag-share { background:rgba(99,179,237,.12); color:#93c5fd !important; -webkit-text-fill-color:#93c5fd !important; }
+.tag-share:hover { background:rgba(99,179,237,.25); }
+
 @media(max-width:700px){
 .page{padding:18px;}
 .test-options{grid-template-columns:1fr;}
@@ -526,7 +627,7 @@ nav{padding:0 14px;}
   ████    
  ████     
 ████      
-███       </pre><span class="version-badge">v2.4.12</span></div>
+███       </pre><span class="version-badge">v2.8</span></div>
   <div class="nav-links">
     <button class="nav-btn active" onclick="showPage('home')">Accueil</button>
     <button class="nav-btn" onclick="showPage('create')">Créer</button>
@@ -538,9 +639,10 @@ nav{padding:0 14px;}
     </div>
     <button class="btn btn-ghost btn-sm" onclick="triggerImport()">⬆ Importer</button>
     <button class="btn btn-accent btn-md" onclick="showPage('create')">+ Nouveau set</button>
+    <a href="flashlearn-mobile.html" title="Version mobile" style="font-size:.8rem;color:var(--muted);text-decoration:none;padding:6px 8px;border-radius:8px;transition:background .2s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''" >📱</a>
   </div>
 </nav>
-<input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImportFile(event)">
+<input type="file" id="import-file" accept=".json,.csv" style="display:none" onchange="handleImportFile(event)">
 
 <!-- MERGE BAR -->
 
@@ -567,7 +669,7 @@ nav{padding:0 14px;}
       ondragover="event.preventDefault();this.classList.add('drag-over')"
       ondragleave="this.classList.remove('drag-over')"
       ondrop="handleDrop(event)" onclick="triggerImport()">
-      <strong>📂 Importer un set depuis un fichier JSON</strong>
+      <strong>📂 Importer un set (JSON ou CSV)</strong>
       Glisser-déposer ou cliquer pour parcourir
     </div>
     <div id="sets-container"></div>
@@ -734,6 +836,30 @@ nav{padding:0 14px;}
 </div>
 <div id="toast"></div>
 
+<!-- Drag overlay global -->
+
+<div class="drag-overlay" id="drag-overlay">
+  <div class="drag-overlay-label">📂 Déposer le fichier ici</div>
+</div>
+
+<!-- Share modal -->
+
+<div class="share-modal-overlay" id="share-modal">
+  <div class="share-modal">
+    <h3 id="share-modal-title">🔗 Partager ce set</h3>
+    <p>Ce lien contient tout le set — la personne peut l'importer directement dans FlashLearn sans avoir besoin du fichier.</p>
+    <div class="share-url-box">
+      <span class="share-url-text" id="share-url-text"></span>
+      <button class="share-copy-btn" onclick="copyShareUrl()">Copier</button>
+    </div>
+    <div class="share-qr" id="share-size-info"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-ghost btn-sm" onclick="closeShareModal()">Fermer</button>
+      <button class="btn btn-accent btn-sm" onclick="exportSetFromShare()">⬇ Télécharger aussi</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════
 //  BROADCAST CHANNEL
@@ -752,11 +878,11 @@ if (bc) bc.onmessage = function(e){
 // ═══════════════════════════════════════════
 //  DATA
 // ═══════════════════════════════════════════
-var sets = JSON.parse(localStorage.getItem('flashlearn_sets') || '[]');
+var sets = (function(){ try { return JSON.parse(localStorage.getItem('flashlearn_sets') || '[]'); } catch(e){ return []; } })();
 var editingId = null;
 
 function saveSets() {
-  localStorage.setItem('flashlearn_sets', JSON.stringify(sets));
+  try { localStorage.setItem('flashlearn_sets', JSON.stringify(sets)); } catch(e){}
   if (bc) { try { bc.postMessage({ type:'sets_updated', sets:sets }); } catch(e){} }
   setSaveInd('saving', 'Sauvegarde…');
   setTimeout(function(){
@@ -800,9 +926,37 @@ function renderHome() {
     c.innerHTML = '<div class="empty"><div class="empty-icon">📚</div><h3>Aucun set pour l\'instant</h3><p>Crée ton premier set ou importe un fichier JSON.</p></div>';
     return;
   }
-  var html = '<div class="section-row"><div class="section-title">Mes sets ('+sets.length+')</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" onclick="startMergeMode()">🔀 Fusionner</button><button class="btn btn-ghost btn-sm" onclick="exportAll()">⬇ Tout exporter</button></div></div>';
 
-  // Render folders first
+  var html = '';
+  var last = sets[0];
+  var totalCards = sets.reduce(function(a,s){return a+s.cards.length;},0);
+
+  // ── Bannière "Continuer" ──
+  html += '<div class="home-continue-banner" onclick="document.getElementById(\'sc-'+last.id+'\')&&document.getElementById(\'sc-'+last.id+'\').scrollIntoView({behavior:\'smooth\',block:\'center\'})">';
+  html +=   '<div style="flex:1;min-width:0">';
+  html +=     '<div class="hcb-label">📖 Continuer à apprendre</div>';
+  html +=     '<div class="hcb-title">'+escHtml(last.title)+'</div>';
+  html +=     '<div class="hcb-meta">'+last.cards.length+' cartes'+(last.desc?' · '+escHtml(last.desc):'')+'</div>';
+  html +=   '</div>';
+  html +=   '<div class="hcb-modes">';
+  html +=     '<span class="hcb-btn hcb-flash" onclick="event.stopPropagation();startFlash(\''+last.id+'\')">⚡ Flash</span>';
+  html +=     '<span class="hcb-btn hcb-write" onclick="event.stopPropagation();startWrite(\''+last.id+'\')">✍ Écrit</span>';
+  html +=     '<span class="hcb-btn hcb-test"  onclick="event.stopPropagation();startTest(\''+last.id+'\')">📝 QCM</span>';
+  html +=   '</div>';
+  html += '</div>';
+
+  // ── Stats rapides ──
+  html += '<div class="home-stats-row">';
+  html +=   '<div class="home-stat"><div class="home-stat-num">'+sets.length+'</div><div class="home-stat-lbl">Sets</div></div>';
+  html +=   '<div class="home-stat"><div class="home-stat-num">'+totalCards+'</div><div class="home-stat-lbl">Cartes</div></div>';
+  html +=   '<div class="home-stat"><div class="home-stat-num">'+folders.length+'</div><div class="home-stat-lbl">Dossiers</div></div>';
+  html += '</div>';
+
+  // ── Actions + sets ──
+  html += '<div class="section-row"><div class="section-title">Mes sets ('+sets.length+')</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" onclick="startMergeMode()">🔀 Fusionner</button><button class="btn btn-ghost btn-sm" onclick="exportAll()">⬇ Tout exporter</button></div></div>';
+
+  // ── Dossiers ──
+  folders.forEach(function(folder) {
   folders.forEach(function(folder) {
     var folderSets = sets.filter(function(s){ return s.folderId === folder.id; });
     var isOpen = folder.open !== false;
@@ -847,6 +1001,7 @@ function setCardHTML(s) {
       '<button class="tag tag-merge" id="mtag-'+s.id+'" onclick="toggleMerge(\''+s.id+'\')">🔀</button>' +
       '<button class="tag tag-edit"  onclick="editSet(\''+s.id+'\')">✏️</button>' +
       '<button class="tag tag-export" onclick="exportSet(\''+s.id+'\')">⬇</button>' +
+      '<button class="tag tag-share" onclick="openShareModal(\''+s.id+'\')">🔗</button>' +
       '<button class="tag" style="background:rgba(99,179,237,.12);color:#93c5fd!important;-webkit-text-fill-color:#93c5fd!important" onclick="openFolderModal(\''+s.id+'\')">📁</button>' +
       '<button class="tag tag-del"   onclick="deleteSet(\''+s.id+'\')">🗑</button>' +
     '</div>' +
@@ -916,8 +1071,9 @@ function triggerImport() { document.getElementById('import-file').click(); }
 
 function handleImportFile(e) {
   var file = e.target.files[0]; if (!file) return;
+  var isCSV = file.name.endsWith('.csv');
   var r = new FileReader();
-  r.onload = function(ev){ importJSON(ev.target.result); };
+  r.onload = function(ev){ isCSV ? importCSV(ev.target.result, file.name) : importJSON(ev.target.result); };
   r.readAsText(file); e.target.value = '';
 }
 
@@ -925,9 +1081,11 @@ function handleDrop(e) {
   e.preventDefault();
   document.getElementById('drop-zone').classList.remove('drag-over');
   var file = e.dataTransfer.files[0];
-  if (!file || !file.name.endsWith('.json')) { showToast('Fichier .json requis'); return; }
+  var isCSV = file.name.endsWith('.csv');
+  var isJSON = file.name.endsWith('.json');
+  if (!isCSV && !isJSON) { showToast('Fichier .json ou .csv requis'); return; }
   var r = new FileReader();
-  r.onload = function(ev){ importJSON(ev.target.result); };
+  r.onload = function(ev){ isCSV ? importCSV(ev.target.result, file.name) : importJSON(ev.target.result); };
   r.readAsText(file);
 }
 
@@ -946,6 +1104,63 @@ function importJSON(text) {
     if (imported) { showToast('✅ '+imported+' set(s) importé(s) !'); renderHome(); }
     else showToast('Aucun set valide trouvé');
   } catch(err) { showToast('❌ Fichier JSON invalide'); }
+}
+
+function importCSV(text, filename) {
+  try {
+    var lines = text.split(/\r?\n/).filter(function(l){ return l.trim(); });
+    if (lines.length < 2) { showToast('CSV vide ou invalide'); return; }
+
+    // Détermine si la première ligne est un header (Term,Definition ou similaire)
+    var firstLine = lines[0].toLowerCase().replace(/['"]/g,'').trim();
+    var hasHeader = /^(term|mot|word|question)/.test(firstLine);
+    var dataLines = hasHeader ? lines.slice(1) : lines;
+
+    function parseCSVLine(line) {
+      // Gère les champs entre guillemets avec virgules internes
+      var result = [];
+      var current = '';
+      var inQuotes = false;
+      for (var i = 0; i < line.length; i++) {
+        var ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && line[i+1] === '"') { current += '"'; i++; } // guillemet doublé
+          else { inQuotes = !inQuotes; }
+        } else if (ch === ',' && !inQuotes) {
+          result.push(current.trim()); current = '';
+        } else {
+          current += ch;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    var cards = [];
+    dataLines.forEach(function(line) {
+      if (!line.trim()) return;
+      var parts = parseCSVLine(line);
+      if (parts.length >= 2) {
+        var term = parts[0].replace(/^"|"$/g,'').trim();
+        var def  = parts[1].replace(/^"|"$/g,'').trim();
+        if (term && def) cards.push({ term: term, def: def });
+      }
+    });
+
+    if (cards.length < 2) { showToast('Aucune carte valide dans le CSV'); return; }
+
+    // Titre = nom du fichier sans extension
+    var title = (filename || 'Import CSV').replace(/\.csv$/i,'').replace(/[-_]/g,' ');
+    var newSet = {
+      id: 'csv_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+      title: title, desc: 'Importé depuis CSV',
+      cards: cards, createdAt: new Date().toISOString()
+    };
+    sets.unshift(newSet);
+    saveSets();
+    showToast('✅ ' + cards.length + ' cartes importées !');
+    renderHome();
+  } catch(err) { showToast('❌ Erreur CSV : ' + err.message); }
 }
 
 function exportSet(id) {
@@ -1420,9 +1635,9 @@ document.addEventListener('keydown',function(e){
 // ═══════════════════════════════════════════
 //  FOLDERS
 // ═══════════════════════════════════════════
-var folders = JSON.parse(localStorage.getItem('flashlearn_folders') || '[]');
+var folders = (function(){ try { return JSON.parse(localStorage.getItem('flashlearn_folders') || '[]'); } catch(e){ return []; } })();
 
-function saveFolders() { localStorage.setItem('flashlearn_folders', JSON.stringify(folders)); }
+function saveFolders() { try { localStorage.setItem('flashlearn_folders', JSON.stringify(folders)); } catch(e){} }
 
 function toggleFolder(id) {
   var f = folders.find(function(f){ return f.id===id; });
@@ -1497,6 +1712,116 @@ function closeFolderModal() {
 document.getElementById('folder-modal').addEventListener('click', function(e){
   if (e.target === this) closeFolderModal();
 });
+
+// ═══════════════════════════════════════════
+//  DRAG & DROP GLOBAL (toute la fenêtre)
+// ═══════════════════════════════════════════
+var dragCounter = 0;
+document.addEventListener('dragenter', function(e) {
+  if (e.dataTransfer && e.dataTransfer.types && Array.from(e.dataTransfer.types).includes('Files')) {
+    dragCounter++;
+    document.getElementById('drag-overlay').classList.add('show');
+  }
+});
+document.addEventListener('dragleave', function(e) {
+  dragCounter--;
+  if (dragCounter <= 0) {
+    dragCounter = 0;
+    document.getElementById('drag-overlay').classList.remove('show');
+  }
+});
+document.addEventListener('dragover', function(e) { e.preventDefault(); });
+document.addEventListener('drop', function(e) {
+  e.preventDefault();
+  dragCounter = 0;
+  document.getElementById('drag-overlay').classList.remove('show');
+  document.getElementById('drop-zone').classList.remove('drag-over');
+  var file = e.dataTransfer.files[0];
+  if (!file) return;
+  var isCSV  = file.name.endsWith('.csv');
+  var isJSON = file.name.endsWith('.json');
+  if (!isCSV && !isJSON) { showToast('Fichier .json ou .csv requis'); return; }
+  var r = new FileReader();
+  r.onload = function(ev){ isCSV ? importCSV(ev.target.result, file.name) : importJSON(ev.target.result); };
+  r.readAsText(file);
+});
+
+// ═══════════════════════════════════════════
+//  PARTAGE PAR LIEN
+// ═══════════════════════════════════════════
+var shareSetId = null;
+
+function openShareModal(id) {
+  shareSetId = id;
+  var s = sets.find(function(s){ return s.id === id; });
+  if (!s) return;
+  document.getElementById('share-modal-title').textContent = '🔗 Partager : ' + s.title;
+  var url = buildShareUrl(s);
+  document.getElementById('share-url-text').textContent = url;
+  var kb = Math.round(url.length / 1024 * 10) / 10;
+  document.getElementById('share-size-info').textContent =
+    s.cards.length + ' cartes · lien de ' + kb + ' ko';
+  document.getElementById('share-modal').classList.add('open');
+}
+
+function closeShareModal() {
+  document.getElementById('share-modal').classList.remove('open');
+  shareSetId = null;
+}
+
+function buildShareUrl(s) {
+  var obj = { title: s.title, desc: s.desc, cards: s.cards, createdAt: s.createdAt };
+  var json = JSON.stringify(obj);
+  var b64;
+  try { b64 = btoa(unescape(encodeURIComponent(json))); } catch(e) { b64 = btoa(json); }
+  return window.location.href.split('?')[0].split('#')[0] + '?set=' + b64;
+}
+
+function copyShareUrl() {
+  var url = document.getElementById('share-url-text').textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(function() {
+      showToast('🔗 Lien copié !');
+    }).catch(function() { fallbackCopyUrl(url); });
+  } else { fallbackCopyUrl(url); }
+}
+
+function fallbackCopyUrl(url) {
+  var ta = document.createElement('textarea');
+  ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); showToast('🔗 Lien copié !'); } catch(e) { showToast('❌ Copie impossible'); }
+  document.body.removeChild(ta);
+}
+
+function exportSetFromShare() {
+  if (shareSetId) exportSet(shareSetId);
+}
+
+// Ferme le share modal en cliquant l'overlay
+document.getElementById('share-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeShareModal();
+});
+
+// ── Import depuis URL (?set=...) ──
+(function checkUrlShare() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var b64 = params.get('set');
+    if (!b64) return;
+    var json = decodeURIComponent(escape(atob(b64)));
+    var data = JSON.parse(json);
+    if (!data.title || !Array.isArray(data.cards)) return;
+    // Propose l'import
+    setTimeout(function() {
+      if (confirm('📦 Set partagé détecté : "' + data.title + '" (' + data.cards.length + ' cartes)\nL'importer dans FlashLearn ?')) {
+        importJSON(JSON.stringify(data));
+      }
+      // Nettoie l'URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }, 600);
+  } catch(e) {}
+})();
 
 renderHome();
 updateSaveInd();
