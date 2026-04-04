@@ -8,18 +8,18 @@
 (function() {
   var ua = navigator.userAgent;
   var isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-  var currentFile = window.location.pathname.split('/').pop();
-  var isDesktopFile = currentFile === 'flashcard-app.html' || currentFile === '';
+  var pathname = window.location.pathname;
+  var currentFile = pathname.split('/').pop();
+  var basePath = pathname.substring(0, pathname.lastIndexOf('/') + 1);
+  var isDesktopFile = currentFile === 'flashcard-app.html' || currentFile === 'index.html' || currentFile === '';
   var isMobileFile  = currentFile === 'flashlearn-mobile.html';
 
-// Si on est sur la version desktop mais sur mobile → redirige vers mobile
 if (isMobile && isDesktopFile) {
-window.location.replace(‘flashlearn-mobile.html’);
+window.location.replace(basePath + ‘flashlearn-mobile.html’);
 return;
 }
-// Si on est sur la version mobile mais sur desktop → redirige vers desktop
 if (!isMobile && isMobileFile) {
-window.location.replace(‘flashcard-app.html’);
+window.location.replace(basePath + ‘index.html’);
 return;
 }
 })();
